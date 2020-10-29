@@ -12,6 +12,7 @@ var ErrWrongSize = errors.New("matrix got wrong size")
 var ErrWrongCoord = errors.New("wrong coord")
 var ErrCellShot = errors.New("cell was shot before")
 var ErrShipsAlreadyInit = errors.New("initialization of ships already exist")
+var ErrGameOver = errors.New("no one ships is present")
 
 type SeaBattleGame struct {
 	size   int
@@ -85,6 +86,9 @@ func (s *SeaBattleGame) setShipOnMatrix(x, y, xEnd, yEnd int) {
 }
 
 func (s *SeaBattleGame) Shot(coord string) (ShotResult, error) {
+	if len(s.ships) == 0 {
+		return NewEmptyShot(), ErrGameOver
+	}
 	x, y, err := getCoords(coord)
 	if err != nil {
 		return ShotResult{}, err

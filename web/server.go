@@ -55,10 +55,10 @@ func (s *ginServer) createMatrix(context *gin.Context) {
 	context.Status(http.StatusOK)
 }
 
-
 type shipRequest struct {
 	Coordinates string `json:"Coordinates"`
 }
+
 func (s *ginServer) ship(context *gin.Context) {
 	log.Println("ship request")
 	defer log.Println("ship proceed")
@@ -76,13 +76,34 @@ func (s *ginServer) ship(context *gin.Context) {
 	}
 	context.Status(http.StatusOK)
 }
-func (s *ginServer) shot(context *gin.Context) {
 
+type shotRequest struct {
+	Coordinates string `json:"coord"`
+}
+
+func (s *ginServer) shot(context *gin.Context) {
+	log.Println("shot request")
+	defer log.Println("shot proceed")
+
+	var request shotRequest
+	if err := context.BindJSON(&request); err != nil {
+		context.Status(http.StatusBadRequest)
+		return
+	}
+
+	shotResult, err := s.model.Shot(request.Coordinates)
+	if err != nil {
+		context.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	context.JSON(http.StatusOK, shotResult)
 }
 func (s *ginServer) clear(context *gin.Context) {
-
+	s.model.Clear()
+	context.Status(http.StatusOK)
 }
 
 func (s *ginServer) state(context *gin.Context) {
-
+	stat := s.model.GetStat()
+	context.JSON(http.StatusOK, stat)
 }
