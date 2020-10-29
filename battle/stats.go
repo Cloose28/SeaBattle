@@ -7,3 +7,19 @@ type Stats struct {
 	Knocked   int
 	ShotCount int
 }
+
+func (s *Stats) setShipCount(count int) {
+	s.ShipCount = count
+}
+
+func (s *Stats) addShot() {
+	s.ShotCount++
+}
+
+func (s *Stats) addDestroyed() {
+	s.Destroyed++
+}
+
+func (s *Stats) addKnocked() {
+	s.Knocked++
+}
