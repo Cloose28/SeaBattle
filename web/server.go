@@ -18,6 +18,7 @@ func NewGinServer(model *battle.SeaBattleGame) *ginServer {
 		model: model,
 	}
 
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.POST("/create-matrix", server.createMatrix)
@@ -47,7 +48,7 @@ func (s *ginServer) createMatrix(context *gin.Context) {
 		context.Status(http.StatusBadRequest)
 		return
 	}
-	err := s.model.CreateGame(params.Size)
+		err := s.model.CreateGame(params.Size)
 	if err != nil {
 		context.Status(http.StatusBadRequest)
 		return
