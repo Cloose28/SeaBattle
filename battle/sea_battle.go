@@ -10,7 +10,7 @@ const minSize = 1
 
 var ErrWrongSize = errors.New("matrix got wrong size")
 var ErrWrongCoord = errors.New("wrong coord")
-var ErrCellShoted = errors.New("cell was shoted before")
+var ErrCellShot = errors.New("cell was shot before")
 
 type SeaBattleGame struct {
 	size   int
@@ -91,16 +91,16 @@ func (s *SeaBattleGame) Shot(coord string) (ShotResult, error) {
 
 	switch s.matrix[x][y] {
 	case Empty:
-		s.matrix[x][y] = Shoted
+		s.matrix[x][y] = Shot
 		s.stats.addShot()
 		return NewEmptyShot(), nil
-	case Shoted:
-		return NewEmptyShot(), ErrCellShoted
+	case Shot:
+		return NewEmptyShot(), ErrCellShot
 	default:
 		shipId := s.matrix[x][y].Int()
 		ship := s.ships[shipId]
-		ship.shipShoted()
-		s.matrix[x][y] = Shoted
+		ship.shipShot()
+		s.matrix[x][y] = Shot
 		if ship.isAlive() {
 			s.stats.addKnocked()
 			return NewKnockedShot(), nil

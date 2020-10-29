@@ -4,7 +4,7 @@ type ship struct {
 	liveCells int
 }
 
-func (s *ship) shipShoted() {
+func (s *ship) shipShot() {
 	s.liveCells--
 }
 

@@ -101,7 +101,7 @@ func TestAddOneShipOnMatrix(t *testing.T) {
 	if battle.ships[expectedShipId.Int()].liveCells != expectedLives {
 		t.Errorf("ship has wrong lives count")
 	}
-	if !isShipOnMap(x, y, xEnd, yEnd, expectedShipId.Int(), battle) {
+	if !isValueOnMap(x, y, xEnd, yEnd, expectedShipId.Int(), battle) {
 		t.Errorf("ship was not added to map")
 	}
 }
@@ -123,7 +123,7 @@ func TestAddTwoShipOnMatrix(t *testing.T) {
 	if battle.ships[expectedShipId.Int()].liveCells != expectedLives1 {
 		t.Errorf("ship has wrong lives count")
 	}
-		if !isShipOnMap(x, y, xEnd, yEnd, expectedShipId.Int(), battle) {
+		if !isValueOnMap(x, y, xEnd, yEnd, expectedShipId.Int(), battle) {
 		t.Errorf("ship was not added to map")
 	}
 }
@@ -136,7 +136,7 @@ func TestAddWrongXYShipOnMatrix(t *testing.T) {
 	if !isEmptyMap {
 		t.Errorf("ship was added to game with wrong coords")
 	}
-	if !isShipOnMap(xEnd, yEnd, x, y, Empty.Int(), battle) {
+	if !isValueOnMap(xEnd, yEnd, x, y, Empty.Int(), battle) {
 		t.Errorf("ship was added to map with wrong coords")
 	}
 }
@@ -196,7 +196,7 @@ func TestShotCellTwice(t *testing.T) {
 		return
 	}
 	_, err = battle.Shot(coord)
-	if err != ErrCellShoted {
+	if err != ErrCellShot {
 		t.Errorf("cell was shooted twice %v", err)
 	}
 }
@@ -264,10 +264,10 @@ func TestStatShipKnocked(t *testing.T) {
 
 
 
-func isShipOnMap(x, y, xEnd, yEnd, shipId int, game *SeaBattleGame) bool {
+func isValueOnMap(x, y, xEnd, yEnd, value int, game *SeaBattleGame) bool {
 	for i := x; i <= xEnd; i++ {
 		for j := y; j <= yEnd; j++ {
-			if game.matrix[i][j].Int() != shipId {
+			if game.matrix[i][j].Int() != value {
 				return false
 			}
 		}

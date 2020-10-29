@@ -4,7 +4,7 @@ type cellStatus int
 
 const (
 	Empty cellStatus = 0
-	Shoted cellStatus = -1
+	Shot  cellStatus = -1
 )
 
 func (c cellStatus) Int() int {
