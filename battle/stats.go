@@ -17,9 +17,11 @@ func (s *Stats) addShot() {
 }
 
 func (s *Stats) addDestroyed() {
+	s.addShot()
 	s.Destroyed++
 }
 
 func (s *Stats) addKnocked() {
+	s.addShot()
 	s.Knocked++
 }

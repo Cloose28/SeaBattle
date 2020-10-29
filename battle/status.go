@@ -14,3 +14,7 @@ func NewDestroyedShot(end bool) ShotResult {
 func NewKnockedShot() ShotResult {
 	return ShotResult{false, true, false}
 }
+
+func NewEmptyShot() ShotResult {
+	return ShotResult{}
+}

@@ -10,12 +10,12 @@ const minSize = 1
 
 var ErrWrongSize = errors.New("matrix got wrong size")
 var ErrWrongCoord = errors.New("wrong coord")
-
+var ErrCellShoted = errors.New("cell was shoted before")
 
 type SeaBattleGame struct {
 	size   int
 	matrix [][]cellStatus
-	ships map[int]*ship
+	ships  map[int]*ship
 	stats  *Stats
 }
 
@@ -28,18 +28,20 @@ func (s *SeaBattleGame) CreateGame(n int) error {
 		return ErrWrongSize
 	}
 	s.size = n
-	s.matrix = make([][]cellStatus, n)
-	for i := 0; i < n; i++ {
-		s.matrix[i] = make([]cellStatus, n)
-	}
-	s.stats = &Stats{}
-	s.ships = make(map[int]*ship)
+	s.initMatrix(n)
+	s.initStats()
+	s.initShips()
 
 	return nil
 }
 
-func (s *SeaBattleGame) InitShips(coordinates string) error {
+func (s *SeaBattleGame) InitShips(coordinates string) (err error) {
 	split := strings.Split(coordinates, ",")
+	defer func() {
+		if err != nil {
+			s.clearMatrix()
+		}
+	}()
 	for _, value := range split {
 		coords := strings.Split(value, " ")
 		if len(coords) != 2 {
@@ -58,6 +60,7 @@ func (s *SeaBattleGame) InitShips(coordinates string) error {
 		}
 		s.setShipOnMatrix(x, y, xEnd, yEnd)
 	}
+	s.stats.setShipCount(len(s.ships))
 	return nil
 }
 
@@ -70,8 +73,10 @@ func (s *SeaBattleGame) setShipOnMatrix(x, y, xEnd, yEnd int) {
 			lives++
 		}
 	}
-	newShip := &ship{liveCells:lives}
-	s.ships[nextShipId] = newShip
+	if lives > 0 {
+		newShip := &ship{liveCells: lives}
+		s.ships[nextShipId] = newShip
+	}
 }
 
 func (s *SeaBattleGame) Shot(coord string) (ShotResult, error) {
@@ -84,9 +89,32 @@ func (s *SeaBattleGame) Shot(coord string) (ShotResult, error) {
 		return ShotResult{}, ErrWrongCoord
 	}
 
+	switch s.matrix[x][y] {
+	case Empty:
+		s.matrix[x][y] = Shoted
+		s.stats.addShot()
+		return NewEmptyShot(), nil
+	case Shoted:
+		return NewEmptyShot(), ErrCellShoted
+	default:
+		shipId := s.matrix[x][y].Int()
+		ship := s.ships[shipId]
+		ship.shipShoted()
+		s.matrix[x][y] = Shoted
+		if ship.isAlive() {
+			s.stats.addKnocked()
+			return NewKnockedShot(), nil
+		} else {
+			delete(s.ships, shipId)
+			s.stats.addDestroyed()
+			isEnd := len(s.ships) == 0
+			return NewDestroyedShot(isEnd), nil
+		}
+	}
+}
 
-
-	return ShotResult{}, nil
+func (s *SeaBattleGame) GetStat() Stats {
+	return *s.stats
 }
 
 func getCoords(coord string) (int, int, error) {
@@ -101,6 +129,32 @@ func (s *SeaBattleGame) isValidCoords(x, y int) bool {
 }
 
 func (s *SeaBattleGame) Clear() {
-	s.size = 0
+	s.clearMatrix()
+	s.initStats()
+}
+
+func (s *SeaBattleGame) initStats() {
 	s.stats = &Stats{}
+}
+
+func (s *SeaBattleGame) initShips() {
+	s.ships = make(map[int]*ship)
+}
+
+func (s *SeaBattleGame) initMatrix(n int) {
+	s.matrix = make([][]cellStatus, n)
+	for i := 0; i < n; i++ {
+		s.matrix[i] = make([]cellStatus, n)
+	}
+}
+
+func (s *SeaBattleGame) clearMatrix() {
+	if len(s.matrix) != s.size {
+		return
+	}
+	for i := 0; i < s.size; i++ {
+		for j := 0; j < s.size; j++ {
+			s.matrix[i][j] = Empty
+		}
+	}
 }
