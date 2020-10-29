@@ -11,6 +11,7 @@ const minSize = 1
 var ErrWrongSize = errors.New("matrix got wrong size")
 var ErrWrongCoord = errors.New("wrong coord")
 var ErrCellShot = errors.New("cell was shot before")
+var ErrShipsAlreadyInit = errors.New("initialization of ships already exist")
 
 type SeaBattleGame struct {
 	size   int
@@ -29,13 +30,17 @@ func (s *SeaBattleGame) CreateGame(n int) error {
 	}
 	s.size = n
 	s.initMatrix(n)
-	s.initStats()
 	s.initShips()
+	s.initStats()
 
 	return nil
 }
 
 func (s *SeaBattleGame) InitShips(coordinates string) (err error) {
+	if len(s.ships) != 0 {
+		return ErrShipsAlreadyInit
+	}
+	s.Clear()
 	split := strings.Split(coordinates, ",")
 	defer func() {
 		if err != nil {
