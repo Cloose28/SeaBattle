@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	listenPort := *flag.Int("port", 8080, "server port")
+	const defaultPort = 4040
+	listenPort := *flag.Int("port", defaultPort, "server port")
 
 	model := battle.CreateSeaBattle()
 
